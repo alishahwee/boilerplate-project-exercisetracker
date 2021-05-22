@@ -17,6 +17,29 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 });
 
+// GET/POST users
+app
+  .route('/api/users')
+  .get((req, res, next) => {
+    User.find({})
+      .select('_id username count log')
+      .exec((err, users) => {
+        err ? next(err) : res.json(users);
+      });
+  })
+  .post((req, res, next) => {
+    const newUser = new User({ username: req.body.username });
+    newUser.save((err) => {
+      err
+        ? next(err)
+        : User.find(newUser)
+            .select('_id username')
+            .exec((err, user) => {
+              err ? next(err) : res.json(user);
+            });
+    });
+  });
+
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port);
 });
