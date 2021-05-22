@@ -4,6 +4,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 app.use(cors());
+app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
