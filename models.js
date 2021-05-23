@@ -6,7 +6,7 @@ const userSchema = new Schema(
   {
     username: { type: String, required: true },
   },
-  { versionKey: false, toJSON: { virtuals: true } }
+  { versionKey: false, toJSON: { virtuals: true }, id: false }
 );
 
 const exerciseSchema = new Schema(
