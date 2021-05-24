@@ -8,10 +8,16 @@ const userSchema = new Schema(
   },
   { versionKey: false, toJSON: { virtuals: true }, id: false }
 );
+userSchema.virtual('log', {
+  ref: 'Exercise',
+  localField: '_id',
+  foreignField: '_userId',
+  justOne: false,
+});
 
 const exerciseSchema = new Schema(
   {
-    _userId: { type: Schema.Types.ObjectId, required: true },
+    userId: { type: Schema.Types.ObjectId, required: true },
     description: { type: String, required: true },
     duration: { type: Number, required: true },
     date: { type: Date, default: Date.now },
