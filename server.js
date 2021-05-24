@@ -32,6 +32,31 @@ app
     });
   });
 
+// POST exercises
+app.post('/api/users/:_id/exercises', (req, res, next) => {
+  const { description, duration, date } = req.body;
+  const userId = req.params._id;
+  const newExercise = new Exercise({
+    userId,
+    description,
+    duration,
+    ...(date.length > 0 && { date }),
+  });
+  newExercise.save((err, exercise) => {
+    if (err) return next(err);
+    User.findById(userId, (err, user) => {
+      const resObj = {
+        _id: user._id,
+        username: user.username,
+        date: exercise.date,
+        duration: exercise.duration,
+        description: exercise.description,
+      };
+      err ? next(err) : res.json(resObj);
+    });
+  });
+});
+
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port);
 });
