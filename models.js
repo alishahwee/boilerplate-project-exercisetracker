@@ -6,7 +6,12 @@ const userSchema = new Schema(
   {
     username: { type: String, required: true },
   },
-  { versionKey: false, toJSON: { virtuals: true }, id: false }
+  {
+    versionKey: false,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    id: false,
+  }
 );
 userSchema.virtual('count').get(function () {
   return this.log.length;
@@ -25,7 +30,12 @@ const exerciseSchema = new Schema(
     duration: { type: Number, required: true },
     date: { type: Date, default: Date.now, get: (v) => v.toDateString() },
   },
-  { versionKey: false, toJSON: { getters: true }, id: false }
+  {
+    versionKey: false,
+    toJSON: { getters: true },
+    toObject: { getters: true },
+    id: false,
+  }
 );
 
 const User = mongoose.model('User', userSchema);
