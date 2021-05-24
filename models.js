@@ -8,10 +8,13 @@ const userSchema = new Schema(
   },
   { versionKey: false, toJSON: { virtuals: true }, id: false }
 );
+userSchema.virtual('count').get(function () {
+  return this.log.length;
+});
 userSchema.virtual('log', {
   ref: 'Exercise',
   localField: '_id',
-  foreignField: '_userId',
+  foreignField: 'userId',
   justOne: false,
 });
 
@@ -20,9 +23,9 @@ const exerciseSchema = new Schema(
     userId: { type: Schema.Types.ObjectId, required: true },
     description: { type: String, required: true },
     duration: { type: Number, required: true },
-    date: { type: Date, default: Date.now },
+    date: { type: Date, default: Date.now, get: (v) => v.toDateString() },
   },
-  { versionKey: false }
+  { versionKey: false, toJSON: { getters: true }, id: false }
 );
 
 const User = mongoose.model('User', userSchema);
