@@ -57,6 +57,26 @@ app.post('/api/users/:_id/exercises', (req, res, next) => {
   });
 });
 
+// GET user logs
+app.get('/api/users/:_id/logs', (req, res, next) => {
+  User.findById(req.params._id)
+    .populate('log', '-_id') // Unable to exclude userId here due to population logic
+    .exec((err, user) => {
+      if (err) {
+        next(err);
+      } else {
+        // Necessary in order to delete properties
+        const userObj = user.toObject();
+
+        // Delete the userId field from the log subdocs
+        for (let i = 0; i < userObj.log.length; i++) {
+          delete userObj.log[i].userId;
+        }
+        res.json(userObj);
+      }
+    });
+});
+
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port);
 });
