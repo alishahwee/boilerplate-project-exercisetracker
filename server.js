@@ -40,7 +40,7 @@ app.post('/api/users/:_id/exercises', (req, res, next) => {
     userId,
     description,
     duration,
-    ...(date.length && date.length > 0 && { date }),
+    ...(date && date.length > 0 && { date }),
   });
   newExercise.save((err, exercise) => {
     if (err) return next(err);
