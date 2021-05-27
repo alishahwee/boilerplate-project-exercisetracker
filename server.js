@@ -48,7 +48,7 @@ app.post('/api/users/:_id/exercises', (req, res, next) => {
       const resObj = {
         _id: user._id,
         username: user.username,
-        date: exercise.date.toDateString(),
+        date: exercise.date,
         duration: exercise.duration,
         description: exercise.description,
       };
@@ -59,20 +59,52 @@ app.post('/api/users/:_id/exercises', (req, res, next) => {
 
 // GET user logs
 app.get('/api/users/:_id/logs', (req, res, next) => {
+  const { from, to, limit } = req.query;
+
+  const dateMatch = {
+    match: {
+      date:
+        from && to
+          ? { $gte: from, $lte: to }
+          : from
+          ? { $gte: from }
+          : { $lte: to },
+    },
+  };
+
+  const limitOption = {
+    options: { limit },
+  };
+
   User.findById(req.params._id)
-    .populate('log', '-_id') // Unable to exclude userId here due to population logic
+    .populate({
+      path: 'log',
+      select: '-_id', // Unable to exclude userId here due to population logic
+      ...((from || to) && dateMatch),
+      ...(limit && limitOption),
+    })
     .exec((err, user) => {
       if (err) {
         next(err);
       } else {
         // Necessary in order to delete properties
-        const userObj = user.toObject();
+        const { _id, username, count, log } = user.toObject();
+
+        // Populate response object
+        const resObj = {
+          _id,
+          username,
+          ...(from && { from: new Date(from.split('-')).toDateString() }),
+          ...(to && { to: new Date(to.split('-')).toDateString() }),
+          count,
+          log,
+        };
 
         // Delete the userId field from the log subdocs
-        for (let i = 0; i < userObj.log.length; i++) {
-          delete userObj.log[i].userId;
+        for (let i = 0; i < resObj.log.length; i++) {
+          delete resObj.log[i].userId;
         }
-        res.json(userObj);
+        res.json(resObj);
       }
     });
 });
