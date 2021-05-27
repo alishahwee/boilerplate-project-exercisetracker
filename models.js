@@ -14,7 +14,7 @@ const userSchema = new Schema(
   }
 );
 userSchema.virtual('count').get(function () {
-  return this.log.length;
+  if (this.log) return this.log.length;
 });
 userSchema.virtual('log', {
   ref: 'Exercise',
